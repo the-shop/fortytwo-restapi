@@ -1,0 +1,53 @@
+#!/bin/sh
+
+PROJECT=`php -r "echo dirname(dirname(dirname(realpath('$0'))));"`
+STAGED_FILES_CMD=`git diff --cached --name-only --diff-filter=ACMR HEAD | grep \\\\.php`
+
+# Run unit tests
+echo "Running unit tests...";
+./vendor/bin/phpunit
+
+# Reject the commit in case of unit test failures
+if [ $? != 0 ];
+then
+	echo "$(tput setaf 1) $(tput setab 7) Unit tests have failures. Commit rejected!$(tput sgr 0)"
+	exit 1
+fi;
+
+# Determine if a file list is passed
+if [ "$#" -eq 1 ]
+then
+	oIFS=$IFS
+	IFS='
+	'
+	SFILES="$1"
+	IFS=$oIFS
+fi
+SFILES=${SFILES:-$STAGED_FILES_CMD}
+
+echo $SFILES
+
+echo "Checking PHP Lint..."
+for FILE in $SFILES
+do
+	php -l -d display_errors=0 $PROJECT/$FILE
+	if [ $? != 0 ]
+	then
+		echo "Fix the error before commit."
+		exit 1
+	fi
+	FILES="$FILES $PROJECT/$FILE"
+done
+
+if [ "$FILES" != "" ]
+then
+	echo "Running Code Sniffer..."
+	./vendor/bin/phpcs --standard=PSR2 --encoding=utf-8 -n -p $FILES
+	if [ $? != 0 ]
+	then
+		echo "Fix the error before commit."
+		exit 1
+	fi
+fi
+
+exit $?

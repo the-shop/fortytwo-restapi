@@ -1,7 +1,7 @@
 42 - RestApi
 ====
 
-Rest API application of the _42_ framework
+Rest API application for the _42_ framework
 
 Install
 ---
@@ -13,6 +13,6 @@ Install
 
 `composer require the-shop/fortytwo-restapi`
 
-Third party dependencies
+3rd party dependencies
 ---
 `symfony/http-foundation`
