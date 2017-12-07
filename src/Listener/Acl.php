@@ -5,6 +5,7 @@ namespace Framework\RestApi\Listener;
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Application\Exception\MethodNotAllowedException;
 use Framework\Base\Event\ListenerInterface;
+use Framework\Http\Request\HttpRequestInterface;
 
 /**
  * Class Acl
@@ -16,19 +17,30 @@ class Acl implements ListenerInterface
 
     /**
      * @param $payload
+     *
      * @return $this
      * @throws MethodNotAllowedException
      */
     public function handle($payload)
     {
-        $request = $this->getApplication()->getRequest();
+        /**
+         * @var HttpRequestInterface $request
+         */
+        $request = $this->getApplication()
+                        ->getRequest();
 
-        $routeParameters = $this->getApplication()->getDispatcher()->getRouteParameters();
+        $routeParameters = $this->getApplication()
+                                ->getDispatcher()
+                                ->getRouteParameters();
+
         $method = $request->getMethod();
         $uri = $request->getUri();
 
         // Remove route prefix
-        $routePrefix = $this->getApplication()->getConfiguration()->getPathValue('routePrefix');
+        $routePrefix = $this->getApplication()
+                            ->getConfiguration()
+                            ->getPathValue('routePrefix');
+
         $uri = str_replace($routePrefix, '', $uri);
 
         // Transform uri to actually registered route so we can compare that route with acl
@@ -37,7 +49,8 @@ class Acl implements ListenerInterface
             $uri = str_replace($value, $modifiedParam, $uri);
         }
 
-        $aclRoutesRules = $this->getApplication()->getAclRules()['routes'];
+        $aclRoutesRules = $this->getApplication()
+                               ->getAclRules()['routes'];
 
         // If route is public and allowed for user role, ALLOW
         if ($this->checkRoutes($uri, $aclRoutesRules['public'][$method]) === true) {
@@ -45,7 +58,7 @@ class Acl implements ListenerInterface
         }
 
         // If route is private and allowed for user role, ALLOW
-        if ($this->checkRoutes($uri, $aclRoutesRules['private'][$method])) {
+        if ($this->checkRoutes($uri, $aclRoutesRules['private'][$method]) === true) {
             return $this;
         }
 
@@ -55,12 +68,12 @@ class Acl implements ListenerInterface
 
     /**
      * @param string $requestedRoute
-     * @param array $routesDefinition
+     * @param array  $routesDefinition
+     *
      * @return bool
      */
     private function checkRoutes(string $requestedRoute, array $routesDefinition = [])
     {
-
         // TODO: Hardcoded admin role -> read role from user, don't leave it hardcoded
         foreach ($routesDefinition as $routeDefinition) {
             if ($routeDefinition['route'] === $requestedRoute

@@ -2,11 +2,18 @@
 
 namespace Framework\RestApiTest\Listener;
 
-use Framework\Base\Test\UnitTest;
 use Framework\RestApi\Listener\ExceptionFormatter;
+use Framework\RestApi\Test\UnitTest;
 
+/**
+ * Class ExceptionFormatterTest
+ * @package Framework\RestApiTest\Listener
+ */
 class ExceptionFormatterTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testEquals()
     {
         $application = $this->getApplication();
@@ -18,12 +25,18 @@ class ExceptionFormatterTest extends UnitTest
 
         $formatter->handle($exception);
 
-        $response = $formatter->getApplication()->getResponse();
+        $response = $formatter->getApplication()
+                              ->getResponse();
 
         $this->assertEquals(500, $response->getCode());
-        $this->assertEquals([
-            'error' => true,
-            'errors' => [$exception->getMessage()]
-        ], $response->getBody());
+        $this->assertEquals(
+            [
+                'error' => true,
+                'errors' => [
+                    $exception->getMessage()
+                ],
+            ],
+            $response->getBody()
+        );
     }
 }

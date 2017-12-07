@@ -5,6 +5,5 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="PRIVATE_MAIL_FROM" value="no-reply@the-shop.hr" />
     </php>
 </phpunit>

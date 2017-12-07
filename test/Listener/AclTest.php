@@ -2,7 +2,9 @@
 
 namespace Framework\RestApi\Test\Listener;
 
-use Framework\Base\Test\UnitTest;
+use Framework\Base\Test\Dummies\TestModel;
+use Framework\Base\Test\Dummies\TestRepository;
+use Framework\RestApi\Test\UnitTest;
 
 /**
  * Class AclTest
@@ -10,6 +12,47 @@ use Framework\Base\Test\UnitTest;
  */
 class AclTest extends UnitTest
 {
+    /**
+     *
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $resourceConfig = ['users' => TestRepository::class];
+
+        $this->getApplication()
+             ->getRepositoryManager()
+             ->registerResources($resourceConfig);
+
+        $repository = $this->getApplication()
+                           ->getRepositoryManager()
+                           ->getRepositoryFromResourceName('users');
+
+        $model = new TestModel();
+
+        $model->defineModelAttributes(
+            $this->getApplication()
+                 ->getConfiguration()
+                 ->getPathValue('models.User.fields')
+        )
+              ->setApplication($this->getApplication())
+              ->setAttribute('email', 'user@user.com')
+              ->setAttribute('password', 'user123')
+              ->setAttribute('role', 'standard');
+
+        $repository->getPrimaryAdapter()
+                   ->setLoadOneResult([$model]);
+    }
+
+    /**
+     *
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+    }
+
     /**
      * Test acl listener for routes, user has got no permission for requested route - exception
      */
@@ -26,9 +69,10 @@ class AclTest extends UnitTest
             ],
         ];
 
-        $this->getApplication()->setAclRules($aclTestRules);
+        $this->getApplication()
+             ->setAclRules($aclTestRules);
 
-        $response = $this->makeHttpRequest('GET', '/api/v1/users');
+        $response = $this->makeHttpRequest('GET', '/users');
 
         $responseBody = $response->getBody();
 
@@ -52,7 +96,7 @@ class AclTest extends UnitTest
                 'private' => [
                     'GET' => [
                         [
-                            'route' => '/{resourceName}',
+                            'route' => '/users',
                             'allows' => [
                                 'admin',
                             ],
@@ -62,9 +106,10 @@ class AclTest extends UnitTest
             ],
         ];
 
-        $this->getApplication()->setAclRules($aclTestRules);
+        $this->getApplication()
+             ->setAclRules($aclTestRules);
 
-        $response = $this->makeHttpRequest('GET', '/api/v1/users');
+        $response = $this->makeHttpRequest('GET', '/users');
 
         $this->assertEquals(200, $response->getCode());
     }
