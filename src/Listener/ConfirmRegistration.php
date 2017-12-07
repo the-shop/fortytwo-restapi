@@ -2,10 +2,10 @@
 
 namespace Framework\RestApi\Listener;
 
-use Application\Services\EmailService;
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Event\ListenerInterface;
 use Framework\Base\Model\BrunoInterface;
+use Framework\Base\Service\EmailService;
 
 /**
  * Class ConfirmRegistration
@@ -17,10 +17,14 @@ class ConfirmRegistration implements ListenerInterface
 
     /**
      * @param $payload
+     *
      * @return $this
      */
     public function handle($payload)
     {
+        /**
+         * @var BrunoInterface $payload
+         */
         if (($payload instanceof BrunoInterface) === true
             && ($payload->getCollection() === 'users') === true
         ) {
@@ -31,7 +35,7 @@ class ConfirmRegistration implements ListenerInterface
             $profileName = $payload->getAttribute('name');
 
             $appConfig = $this->getApplication()
-                ->getConfiguration();
+                              ->getConfiguration();
 
             $textBody = 'You have been successfully registered!';
             $htmlBody = /** @lang text */
@@ -46,9 +50,9 @@ class ConfirmRegistration implements ListenerInterface
 
             /**
              * @var EmailService $mailSender
-             * @todo lose APPLICATION DEPENDENCY
              */
-            $mailSender = $this->getApplication()->getService(EmailService::class);
+            $mailSender = $this->getApplication()
+                               ->getService(EmailService::class);
 
             $mailSender->sendEmail(
                 $appConfig->getPathValue('env.PRIVATE_MAIL_FROM'),

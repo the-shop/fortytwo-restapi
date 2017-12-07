@@ -16,13 +16,14 @@ class ResponseFormatter implements ListenerInterface
 
     /**
      * @param $payload
-     * @return mixed
+     *
+     * @return ListenerInterface
      */
     public function handle($payload)
     {
         $responseBody = $this->getApplication()
-            ->getResponse()
-            ->getBody();
+                             ->getResponse()
+                             ->getBody();
 
         $out = $responseBody;
 
@@ -47,14 +48,15 @@ class ResponseFormatter implements ListenerInterface
         }
 
         $this->getApplication()
-            ->getResponse()
-            ->setBody($out);
+             ->getResponse()
+             ->setBody($out);
 
         return $this;
     }
 
     /**
      * @param $record
+     *
      * @return mixed
      */
     public function formatSingleRecord($record)
@@ -69,10 +71,9 @@ class ResponseFormatter implements ListenerInterface
         if ($record instanceof BrunoInterface) {
             $modelAttributes = $record->getAttributes();
 
-            $definedModelAttributes =
-                $this->getApplication()
-                     ->getRepositoryManager()
-                     ->getRegisteredModelFields($record->getCollection());
+            $definedModelAttributes = $this->getApplication()
+                                           ->getRepositoryManager()
+                                           ->getRegisteredModelFields($record->getCollection());
 
             foreach ($definedModelAttributes as $attribute => $options) {
                 if (array_key_exists($attribute, $modelAttributes) === false) {

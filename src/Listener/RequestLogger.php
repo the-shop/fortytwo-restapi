@@ -4,6 +4,9 @@ namespace Framework\RestApi\Listener;
 
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Event\ListenerInterface;
+use Framework\Http\Request\HttpRequestInterface;
+use Framework\RestApi\Auth\RequestAuthorization;
+use Framework\RestApi\RestApiApplicationInterface;
 
 /**
  * Class RequestLogger
@@ -15,13 +18,24 @@ class RequestLogger implements ListenerInterface
 
     /**
      * Handle an incoming request.
+     *
      * @param $payload
-     * @return mixed
+     *
+     * @return ListenerInterface
      */
     public function handle($payload)
     {
+        /**
+         * @var RestApiApplicationInterface $app
+         */
         $app = $this->getApplication();
+        /**
+         * @var HttpRequestInterface $request
+         */
         $request = $app->getRequest();
+        /**
+         * @var RequestAuthorization $requestAuth
+         */
         $requestAuth = $app->getRequestAuthorization();
 
         $name = '';
@@ -37,7 +51,7 @@ class RequestLogger implements ListenerInterface
 
         $logData = [
             'name' => $name,
-            'id' => $id,
+            'userId' => $id,
             'date' => (new \DateTime())->format('d-m-Y H:i:s'),
             'ip' => $request->getClientIp(),
             'uri' => $request->getUri(),

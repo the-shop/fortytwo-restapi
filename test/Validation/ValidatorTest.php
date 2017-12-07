@@ -3,8 +3,8 @@
 namespace Framework\RestApiTest\Validation;
 
 use Framework\Base\Application\Exception\ValidationException;
-use Framework\Base\Test\UnitTest;
 use Framework\Base\Validation\Validator;
+use Framework\RestApi\Test\UnitTest;
 
 /**
  * Class ValidatorTest
@@ -18,12 +18,12 @@ class ValidatorTest extends UnitTest
     public function testAlphabeticValidationFailed()
     {
         $validator = new Validator();
-        $validator->addValidation(1212, 'alphabetic');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
 
-        $this->assertEquals(['alphabetic' => 1212], $validator->getFailed());
+        $validator->addValidation(1212, 'alphabetic')
+                  ->validate();
     }
 
     /**
@@ -32,8 +32,10 @@ class ValidatorTest extends UnitTest
     public function testAlphabeticValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('test', 'alphabetic');
-        $validator->validate();
+
+        $validator->addValidation('test', 'alphabetic')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -43,12 +45,12 @@ class ValidatorTest extends UnitTest
     public function testArrayValidationFailed()
     {
         $validator = new Validator();
-        $validator->addValidation('test', 'array');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
 
-        $this->assertEquals(['array' => 'test'], $validator->getFailed());
+        $validator->addValidation('test', 'array')
+                  ->validate();
     }
 
     /**
@@ -57,8 +59,10 @@ class ValidatorTest extends UnitTest
     public function testArrayValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation(['test'], 'array');
-        $validator->validate();
+
+        $validator->addValidation(['test'], 'array')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -68,12 +72,12 @@ class ValidatorTest extends UnitTest
     public function testBooleanValidationFailed()
     {
         $validator = new Validator();
-        $validator->addValidation('test', 'boolean');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
 
-        $this->assertEquals(['boolean' => 'test'], $validator->getFailed());
+        $validator->addValidation('test', 'boolean')
+                  ->validate();
     }
 
     /**
@@ -82,8 +86,10 @@ class ValidatorTest extends UnitTest
     public function testBooleanValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation(true, 'boolean');
-        $validator->validate();
+
+        $validator->addValidation(true, 'boolean')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -94,12 +100,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 'test@121212.1212';
-        $validator->addValidation($value, 'email');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
 
-        $this->assertEquals(['email' => $value], $validator->getFailed());
+        $validator->addValidation($value, 'email')
+                  ->validate();
     }
 
     /**
@@ -108,8 +114,10 @@ class ValidatorTest extends UnitTest
     public function testEmailValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('test@test.com', 'email');
-        $validator->validate();
+
+        $validator->addValidation('test@test.com', 'email')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -120,11 +128,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 'foo';
-        $validator->addValidation($value, 'float');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['float' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'float')
+                  ->validate();
     }
 
     /**
@@ -133,8 +142,10 @@ class ValidatorTest extends UnitTest
     public function testFloatValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation(12.12, 'float');
-        $validator->validate();
+
+        $validator->addValidation(12.12, 'float')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -145,11 +156,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 12.12;
-        $validator->addValidation($value, 'integer');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['integer' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'integer')
+                  ->validate();
     }
 
     /**
@@ -158,8 +170,10 @@ class ValidatorTest extends UnitTest
     public function testIntegerValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation(12, 'integer');
-        $validator->validate();
+
+        $validator->addValidation(12, 'integer')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -170,11 +184,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = "";
-        $validator->addValidation($value, 'nonempty');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['nonempty' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'nonempty')
+                  ->validate();
     }
 
     /**
@@ -183,8 +198,10 @@ class ValidatorTest extends UnitTest
     public function testNonEmptyValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation(12.12, 'nonempty');
-        $validator->validate();
+
+        $validator->addValidation(12.12, 'nonempty')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -195,11 +212,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = true;
-        $validator->addValidation($value, 'string');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['string' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'string')
+                  ->validate();
     }
 
     /**
@@ -208,8 +226,10 @@ class ValidatorTest extends UnitTest
     public function testStringValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('test', 'string');
-        $validator->validate();
+
+        $validator->addValidation('test', 'string')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -220,11 +240,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 'test*/..+';
-        $validator->addValidation($value, 'alpha_dash');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['alpha_dash' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'alpha_dash')
+                  ->validate();
     }
 
     /**
@@ -233,8 +254,10 @@ class ValidatorTest extends UnitTest
     public function testAlphaDashValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('test-test', 'alpha_dash');
-        $validator->validate();
+
+        $validator->addValidation('test-test', 'alpha_dash')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -245,11 +268,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 'test1';
-        $validator->addValidation($value, 'numeric');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['numeric' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'numeric')
+                  ->validate();
     }
 
     /**
@@ -258,8 +282,10 @@ class ValidatorTest extends UnitTest
     public function testNumericValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('123.32', 'numeric');
-        $validator->validate();
+
+        $validator->addValidation('123.32', 'numeric')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -270,11 +296,12 @@ class ValidatorTest extends UnitTest
     {
         $validator = new Validator();
         $value = 'test112-';
-        $validator->addValidation($value, 'alpha_numeric');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals(['alpha_numeric' => $value], $validator->getFailed());
+
+        $validator->addValidation($value, 'alpha_numeric')
+                  ->validate();
     }
 
     /**
@@ -283,8 +310,10 @@ class ValidatorTest extends UnitTest
     public function testAlphaNumericValidationSuccess()
     {
         $validator = new Validator();
-        $validator->addValidation('test12332', 'alpha_numeric');
-        $validator->validate();
+
+        $validator->addValidation('test12332', 'alpha_numeric')
+                  ->validate();
+
         $this->assertEquals([], $validator->getFailed());
     }
 
@@ -296,26 +325,21 @@ class ValidatorTest extends UnitTest
         $validator = new Validator();
         $value = 'test';
         $number = 12;
-        $validator->addValidation($value, 'string');
-        $validator->addValidation($number, 'integer');
-        $validator->addValidation($value, 'array');
-        $validator->addValidation($value, 'alphabetic');
-        $validator->addValidation($value, 'boolean');
-        $validator->addValidation($value, 'email');
-        $validator->addValidation($number, 'float');
-        $validator->addValidation($number, 'nonempty');
-        $validator->addValidation($number, 'alpha_numeric');
-        $validator->addValidation($value, 'numeric');
-        $validator->addValidation($number, 'alpha_dash');
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Validation failed');
-        $validator->validate();
-        $this->assertEquals([
-            'array' => $value,
-            'boolean' => $value,
-            'email' => $value,
-            'float' => $number,
-            'numeric' => $value
-        ], $validator->getFailed());
+
+        $validator->addValidation($value, 'string')
+                  ->addValidation($number, 'integer')
+                  ->addValidation($value, 'array')
+                  ->addValidation($value, 'alphabetic')
+                  ->addValidation($value, 'boolean')
+                  ->addValidation($value, 'email')
+                  ->addValidation($number, 'float')
+                  ->addValidation($number, 'nonempty')
+                  ->addValidation($number, 'alpha_numeric')
+                  ->addValidation($value, 'numeric')
+                  ->addValidation($number, 'alpha_dash')
+                  ->validate();
     }
 }

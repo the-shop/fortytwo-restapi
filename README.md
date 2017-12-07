@@ -15,4 +15,4 @@ Install
 
 3rd party dependencies
 ---
-`symfony/http-foundation`
+`firebase/php-jwt`

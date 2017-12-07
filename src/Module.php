@@ -2,7 +2,6 @@
 
 namespace Framework\RestApi;
 
-use Framework\Base\Application\ApplicationInterface;
 use Framework\Base\Module\BaseModule;
 
 /**
@@ -13,14 +12,17 @@ class Module extends BaseModule
 {
     /**
      * @inheritdoc
-    */
+     */
     public function bootstrap()
     {
-        $application = $this->getApplication();
-
         // Let's read all files from module config folder and set to Configuration
-        $configDirPath = $application->getRootPath() . '/Modules/RestApi/config/';
+        $configDirPath = realpath(dirname(__DIR__)) . '/config/';
         $this->setModuleConfiguration($configDirPath);
+
+        /**
+         * @var \Framework\RestApi\RestApiApplicationInterface $application
+         */
+        $application = $this->getApplication();
         $appConfig = $application->getConfiguration();
 
         // Add listeners to application
@@ -31,69 +33,10 @@ class Module extends BaseModule
             }
         }
 
-        $authModelsConfigs = $this->getAuthenticatables($application);
-
-        if (empty($authModelsConfigs) === false) {
-            $appConfig->setPathValue(
-                'routes',
-                [
-                    [
-                        'post',
-                        '/login',
-                        '\Framework\Base\Auth\Controller\AuthController::authenticate',
-                    ],
-                    [
-                        'post',
-                        '/forgotPassword',
-                        '\Framework\Base\Auth\Controller\AuthController::forgotPassword',
-                    ],
-                    [
-                        'post',
-                        '/resetPassword',
-                        '\Framework\Base\Auth\Controller\AuthController::resetPassword',
-                    ],
-                ]
-            );
-
-            $application->getDispatcher()
-                        ->addRoutes($appConfig->getPathValue('routes'));
-
-            $application->getRepositoryManager()
-                        ->addAuthenticatableModels($authModelsConfigs);
+        // Register Auth Strategies
+        $authStrategies = $appConfig->getPathValue('authStrategies');
+        foreach ($authStrategies as $name => $fullyQualifiedClassName) {
+            $application->registerAuthStrategy($name, $fullyQualifiedClassName);
         }
-    }
-
-    /**
-     * @param \Framework\Base\Application\ApplicationInterface $application
-     *
-     * @return array
-     */
-    private function getAuthenticatables(ApplicationInterface $application): array
-    {
-        $models = [];
-
-        $config = $this->readDecodedJsonFile(
-            $application->getRootPath() . '/Application/config/models.json'
-        );
-
-        if ($config === null) {
-            throw new \RuntimeException('Config file missing');
-        }
-        foreach ($config['models'] as $modelName => $params) {
-            if (isset($params['authenticatable']) === true &&
-                $params['authenticatable'] === true &&
-                isset($params['authStrategy']) === true &&
-                isset($params['credentials']) === true &&
-                is_array($params['credentials']) === true &&
-                isset($params['aclRoleField']) === true
-            ) {
-                $models[$params['collection']] = [
-                    'strategy' => $params['authStrategy'],
-                    'credentials' => $params['credentials'],
-                    'aclRole' => $params['aclRoleField'],
-                ];
-            }
-        }
-        return $models;
     }
 }

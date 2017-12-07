@@ -4,9 +4,14 @@ namespace Framework\RestApi\Listener;
 
 use Firebase\JWT\JWT;
 use Framework\Base\Application\ApplicationAwareTrait;
-use Framework\Base\Auth\RequestAuthorization;
 use Framework\Base\Event\ListenerInterface;
+use Framework\Http\Request\HttpRequestInterface;
+use Framework\RestApi\Auth\RequestAuthorization;
 
+/**
+ * Class AuthenticationListener
+ * @package Framework\RestApi\Listener
+ */
 class AuthenticationListener implements ListenerInterface
 {
     use ApplicationAwareTrait;
@@ -23,11 +28,12 @@ class AuthenticationListener implements ListenerInterface
          */
 
         /**
-         * @var \Framework\Http\Request\RequestInterface $request
-         * @todo lose 42 - Http dependency
+         * @var HttpRequestInterface $request
          */
-        $request = $this->getApplication()->getRequest();
+        $request = $this->getApplication()
+                        ->getRequest();
         $headers = $request->getHeaders();
+
         $requestAuth = new RequestAuthorization();
         JWT::$timestamp = time();
         $alg = 'HS384';
@@ -58,7 +64,8 @@ class AuthenticationListener implements ListenerInterface
 
         $jwt = JWT::encode($payload, $key, $alg);
 
-        $this->getApplication()->setRequestAuthorization($requestAuth);
+        $this->getApplication()
+             ->setRequestAuthorization($requestAuth);
 
         $this->getApplication()
              ->getResponse()

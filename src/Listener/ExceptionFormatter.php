@@ -19,8 +19,8 @@ class ExceptionFormatter implements ListenerInterface
 
     /**
      * @param \Exception $exception
-     * @return $this
-     * @todo lose 42 - Http dependency
+     *
+     * @return ListenerInterface
      */
     public function handle($exception)
     {
@@ -64,13 +64,15 @@ class ExceptionFormatter implements ListenerInterface
             $response->setCode(400);
         }
 
-        $response->setBody([
-            'error' => true,
-            'errors' => $errors
-        ]);
+        $response->setBody(
+            [
+                'error' => true,
+                'errors' => $errors
+            ]
+        );
 
         $this->getApplication()
-            ->setResponse($response);
+             ->setResponse($response);
 
         return $this;
     }
