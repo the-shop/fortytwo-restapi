@@ -98,7 +98,7 @@ class AclTest extends UnitTest
                         [
                             'route' => '/users',
                             'allows' => [
-                                'admin',
+                                'guest',
                             ],
                         ],
                     ],
