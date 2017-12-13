@@ -6,6 +6,8 @@ use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Application\Exception\MethodNotAllowedException;
 use Framework\Base\Event\ListenerInterface;
 use Framework\Http\Request\HttpRequestInterface;
+use Framework\RestApi\Auth\RequestAuthorization;
+use Framework\RestApi\RestApiApplicationInterface;
 
 /**
  * Class Acl
@@ -18,66 +20,78 @@ class Acl implements ListenerInterface
     /**
      * @param $payload
      *
-     * @return $this
+     * @return mixed
      * @throws MethodNotAllowedException
      */
     public function handle($payload)
     {
         /**
-         * @var HttpRequestInterface $request
+         * @var RestApiApplicationInterface $app
          */
-        $request = $this->getApplication()
-                        ->getRequest();
+        $app = $this->getApplication();
 
-        $routeParameters = $this->getApplication()
-                                ->getDispatcher()
-                                ->getRouteParameters();
+        if (empty($app->getAclRules()) === false) {
 
-        $method = $request->getMethod();
-        $uri = $request->getUri();
+            /**
+             * @var HttpRequestInterface $request
+             */
+            $request = $app->getRequest();
 
-        // Remove route prefix
-        $routePrefix = $this->getApplication()
-                            ->getConfiguration()
-                            ->getPathValue('routePrefix');
+            $routeParameters = $app->getDispatcher()
+                                   ->getRouteParameters();
 
-        $uri = str_replace($routePrefix, '', $uri);
+            $method = $request->getMethod();
 
-        // Transform uri to actually registered route so we can compare that route with acl
-        foreach ($routeParameters as $param => $value) {
-            $modifiedParam = "{" . $param . "}";
-            $uri = str_replace($value, $modifiedParam, $uri);
+            // Remove route prefix
+            $routePrefix = $app->getConfiguration()
+                               ->getPathValue('routePrefix');
+
+            $uri = str_replace($routePrefix, '', $request->getUri());
+
+            // Transform uri to actually registered route so we can compare that route with acl
+            foreach ($routeParameters as $param => $value) {
+                $modifiedParam = "{$param}";
+                $uri = str_replace($value, $modifiedParam, $uri);
+            }
+
+            $aclRoutesRules = $app->getAclRules()['routes'];
+
+            $reqAuthorization = $app->getRequestAuthorization();
+
+            // If route is public and allowed for user role, ALLOW
+            if ($this->checkRoutes($uri, $aclRoutesRules['public'][$method], $reqAuthorization) === true) {
+                return $this;
+            }
+
+            // If route is private and allowed for user role, ALLOW
+            if ($this->checkRoutes($uri, $aclRoutesRules['private'][$method], $reqAuthorization) === true) {
+                return $this;
+            }
+
+            // If no rules defined for this route and user role or no permissions, DENY
+            throw new MethodNotAllowedException('Permission denied.', 403);
         }
 
-        $aclRoutesRules = $this->getApplication()
-                               ->getAclRules()['routes'];
-
-        // If route is public and allowed for user role, ALLOW
-        if ($this->checkRoutes($uri, $aclRoutesRules['public'][$method]) === true) {
-            return $this;
-        }
-
-        // If route is private and allowed for user role, ALLOW
-        if ($this->checkRoutes($uri, $aclRoutesRules['private'][$method]) === true) {
-            return $this;
-        }
-
-        // If no rules defined for this route and user role, DENY
-        throw new MethodNotAllowedException('Permission denied.', 403);
+        return null;
     }
 
     /**
-     * @param string $requestedRoute
-     * @param array  $routesDefinition
+     * @param string               $requestedRoute
+     * @param array                $routesDefinition
+     * @param RequestAuthorization $requestAuthorization
      *
      * @return bool
      */
-    private function checkRoutes(string $requestedRoute, array $routesDefinition = [])
+    private function checkRoutes(
+        string $requestedRoute,
+        array $routesDefinition = [],
+        RequestAuthorization $requestAuthorization)
     {
-        // TODO: Hardcoded admin role -> read role from user, don't leave it hardcoded
+        $role = $requestAuthorization->getRole();
+
         foreach ($routesDefinition as $routeDefinition) {
-            if ($routeDefinition['route'] === $requestedRoute
-                && in_array('admin', $routeDefinition['allows']) === true) {
+            if (strtolower($routeDefinition['route']) === $requestedRoute
+                && in_array($role, $routeDefinition['allows']) === true) {
                 return true;
             }
         }

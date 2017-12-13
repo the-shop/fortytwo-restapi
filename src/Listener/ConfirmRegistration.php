@@ -22,13 +22,16 @@ class ConfirmRegistration implements ListenerInterface
      */
     public function handle($payload)
     {
+        $authModels = $this->getApplication()
+                           ->getRepositoryManager()
+                           ->getAuthenticatableModels();
+
         /**
          * @var BrunoInterface $payload
          */
         if (($payload instanceof BrunoInterface) === true
-            && ($payload->getCollection() === 'users') === true
+            && isset($authModels[$payload->getCollection()]) === true
         ) {
-
             /**
              * @var BrunoInterface $payload
              */
@@ -59,6 +62,7 @@ class ConfirmRegistration implements ListenerInterface
                 $appConfig->getPathValue('env.PRIVATE_MAIL_SUBJECT'),
                 $payload->getAttribute('email'),
                 $htmlBody,
+                [],
                 $textBody
             );
         }

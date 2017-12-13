@@ -3,6 +3,8 @@
 use Framework\Base\Application\BaseApplication;
 use Framework\Base\Application\Exception\ExceptionHandler;
 use Framework\RestApi\Auth\Strategy\PasswordAuthStrategy;
+use Framework\RestApi\Listener\Acl;
+use Framework\RestApi\Listener\AuthenticationListener;
 use Framework\RestApi\Listener\ExceptionFormatter;
 use Framework\RestApi\Listener\ResponseFormatter;
 
@@ -30,6 +32,10 @@ return [
         ],
         ExceptionHandler::EVENT_EXCEPTION_HANDLER_HANDLE_PRE => [
             ExceptionFormatter::class,
+        ],
+        BaseApplication::EVENT_APPLICATION_HANDLE_REQUEST_PRE => [
+            AuthenticationListener::class,
+            Acl::class,
         ],
     ],
     'env' => [
