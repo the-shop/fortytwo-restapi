@@ -5,5 +5,9 @@
         </testsuite>
     </testsuites>
     <php>
+        <env name="DATABASE_ADDRESS" value="192.168.33.10:27017"/>
+        <env name="DATABASE_NAME" value="framework-test"/>
+        <env name="PRIVATE_MAIL_FROM" value="no-reply@the-shop.hr" />
+        <env name="WEB_DOMAIN" value="http://platform.the-shop.io/" />
     </php>
 </phpunit>
