@@ -1,8 +1,10 @@
 <?php
 
+use Framework\Base\Service\EmailService;
 use Framework\Base\Test\Dummies\TestDatabaseAdapter;
 use Framework\Base\Test\Dummies\TestModel;
 use Framework\Base\Test\Dummies\TestRepository;
+use Framework\RestApi\Test\Dummies\DummySendGrid;
 
 return [
     'routePrefix' => '',
@@ -28,6 +30,15 @@ return [
         'tests' => TestDatabaseAdapter::class,
         'users' => TestDatabaseAdapter::class,
     ],
+    'services' => [
+        EmailService::class => [
+            'mailerInterface' => DummySendGrid::class,
+            'mailerClient' => [
+                'classPath' => DummySendGrid::class,
+                'constructorArguments' => [],
+            ],
+        ],
+    ],
     "models" => [
         "User" => [
             "collection" => "users",
@@ -35,7 +46,7 @@ return [
             "authStrategy" => "password",
             "credentials" => [
                 "email",
-                "password"
+                "password",
             ],
             "aclRoleField" => "role",
             "fields" => [
@@ -45,16 +56,16 @@ return [
                     "type" => "string",
                     "disabled" => true,
                     "required" => false,
-                    "default" => ""
+                    "default" => "",
                 ],
                 "name" => [
                     "label" => "Name",
                     "type" => "string",
                     "required" => true,
                     "validation" => [
-                        "string"
+                        "string",
                     ],
-                    "default" => ""
+                    "default" => "",
                 ],
                 "email" => [
                     "label" => "Email",
@@ -63,33 +74,65 @@ return [
                     "validation" => [
                         "string",
                         "email",
-                        "unique"
+                        "unique",
                     ],
-                    "default" => ""
+                    "default" => "",
                 ],
                 "password" => [
                     "label" => "Password",
                     "type" => "password",
                     "required" => true,
                     "validation" => [],
-                    "default" => null
+                    "default" => null,
+                ],
+                "newPassword" => [
+                    "label" => "New Password",
+                    "type" => "password",
+                    "required" => false,
+                    "validation" => [],
+                    "default" => null,
+                ],
+                "repeatNewPassword" => [
+                    "label" => "Repeat New Password",
+                    "type" => "password",
+                    "required" => false,
+                    "validation" => [],
+                    "default" => null,
                 ],
                 "role" => [
                     "label" => "Role",
                     "type" => "string",
                     "required" => false,
                     "validation" => [
-                        "string"
+                        "string",
                     ],
-                    "default" => ""
+                    "default" => "standard",
                 ],
                 "admin" => [
                     "label" => "Admin",
                     "type" => "boolean",
                     "required" => false,
                     "validation" => [
-                        "boolean"
+                        "boolean",
                     ],
+                ],
+                "passwordForgot" => [
+                    "label" => "Password Forgot",
+                    "type" => "boolean",
+                    "required" => false,
+                    "default" => false,
+                ],
+                "passwordResetToken" => [
+                    "label" => "Password Reset Token",
+                    "type" => "string",
+                    "required" => false,
+                    "default" => "",
+                ],
+                "passwordResetTime" => [
+                    "label" => "Password Reset Time",
+                    "type" => "integer",
+                    "required" => false,
+                    "default" => 0,
                 ],
             ],
         ],
@@ -99,7 +142,7 @@ return [
             "authStrategy" => "password",
             "credentials" => [
                 "email",
-                "password"
+                "password",
             ],
             "aclRoleField" => "role",
             "fields" => [
@@ -109,16 +152,16 @@ return [
                     "type" => "string",
                     "disabled" => true,
                     "required" => false,
-                    "default" => ""
+                    "default" => "",
                 ],
                 "name" => [
                     "label" => "Name",
                     "type" => "string",
                     "required" => true,
                     "validation" => [
-                        "string"
+                        "string",
                     ],
-                    "default" => ""
+                    "default" => "",
                 ],
                 "email" => [
                     "label" => "Email",
@@ -127,33 +170,65 @@ return [
                     "validation" => [
                         "string",
                         "email",
-                        "unique"
+                        "unique",
                     ],
-                    "default" => ""
+                    "default" => "",
                 ],
                 "password" => [
                     "label" => "Password",
                     "type" => "password",
                     "required" => true,
                     "validation" => [],
-                    "default" => null
+                    "default" => null,
+                ],
+                "newPassword" => [
+                    "label" => "New Password",
+                    "type" => "password",
+                    "required" => false,
+                    "validation" => [],
+                    "default" => null,
+                ],
+                "repeatNewPassword" => [
+                    "label" => "Repeat New Password",
+                    "type" => "password",
+                    "required" => false,
+                    "validation" => [],
+                    "default" => null,
                 ],
                 "role" => [
                     "label" => "Role",
                     "type" => "string",
                     "required" => false,
                     "validation" => [
-                        "string"
+                        "string",
                     ],
-                    "default" => ""
+                    "default" => "",
                 ],
                 "admin" => [
                     "label" => "Admin",
                     "type" => "boolean",
                     "required" => false,
                     "validation" => [
-                        "boolean"
+                        "boolean",
                     ],
+                ],
+                "passwordForgot" => [
+                    "label" => "Password Forgot",
+                    "type" => "boolean",
+                    "required" => false,
+                    "default" => false,
+                ],
+                "passwordResetToken" => [
+                    "label" => "Password Reset Token",
+                    "type" => "string",
+                    "required" => false,
+                    "default" => "",
+                ],
+                "passwordResetTime" => [
+                    "label" => "Password Reset Time",
+                    "type" => "integer",
+                    "required" => false,
+                    "default" => 0,
                 ],
             ],
         ],
@@ -161,16 +236,7 @@ return [
     "acl" => [
         "routes" => [
             "public" => [
-                "GET" => [
-                    [
-                        "route" => "/login",
-                        "allows" => [
-                            "admin",
-                            "standard",
-                            "guest",
-                        ],
-                    ],
-                ],
+                "GET" => [],
                 "POST" => [
                     [
                         "route" => "/login",
@@ -211,6 +277,10 @@ return [
                         ],
                     ],
                 ],
+                "POST" => [],
+                "PUT" => [],
+                "PATCH" => [],
+                "DELETE" => [],
             ],
         ],
         "roles" => [

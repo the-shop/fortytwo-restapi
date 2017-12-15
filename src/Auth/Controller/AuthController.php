@@ -108,13 +108,14 @@ class AuthController extends HttpController
      * @return string
      * @throws NotFoundException
      * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function forgotPassword()
     {
         // Check if there is email field
         $postParams = $this->getPost();
         if (isset($postParams['email']) === false) {
-            throw new NotFoundException('Email field missing.', 404);
+            throw new \InvalidArgumentException('Email field missing.', 404);
         }
 
         // Load user model
@@ -223,7 +224,7 @@ class AuthController extends HttpController
         $unixNow = (int)(new \DateTime())->format('U');
 
         if ($unixNow - $modelAttributes['passwordResetTime'] > (24 * 60 * 60)) {
-            throw new \HttpRuntimeException('Token has expired.', 400);
+            throw new AuthenticationException('Token has expired.', 400);
         }
 
         if (isset($postParams['newPassword']) === false

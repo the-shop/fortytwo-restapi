@@ -42,6 +42,13 @@ class ExceptionFormatter implements ListenerInterface
             ];
         }
 
+        if ($exception instanceof \InvalidArgumentException === true) {
+            $response->setCode(400);
+            $errors = [
+                $exception->getMessage()
+            ];
+        }
+
         if ($exception instanceof NotFoundException === true) {
             $response->setCode(404);
             $errors = [

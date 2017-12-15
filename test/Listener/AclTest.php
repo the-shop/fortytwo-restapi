@@ -64,7 +64,15 @@ class AclTest extends UnitTest
                     'GET' => [],
                 ],
                 'private' => [
-                    'GET' => [],
+                    'GET' => [
+                        [
+                            'route' => '/users',
+                            'allows' => [
+                                'admin',
+                                'standard'
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

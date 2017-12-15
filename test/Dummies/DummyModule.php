@@ -60,6 +60,12 @@ class DummyModule extends BaseModule
             $repositoryManager->setPrimaryAdapter($model, new $primaryAdapter());
         }
 
+        $services = $config->getPathValue('services');
+        foreach ($services as $serviceName => $conf) {
+            $app->registerService(new $serviceName($conf));
+        }
+
+
         // Register resources, repositories and model fields
         $repositoryManager->registerResources($modelsConfiguration['resources'])
                           ->registerRepositories($config->getPathValue('repositories'))

@@ -46,12 +46,6 @@ class UnitTest extends TestCase
         // Remove render events from the application
         $this->getApplication()
              ->removeEventListeners(BaseApplication::EVENT_APPLICATION_RENDER_RESPONSE_PRE);
-
-        $this->getApplication()
-             ->listen(
-                 BaseApplication::EVENT_APPLICATION_HANDLE_REQUEST_PRE,
-                 Acl::class
-             );
     }
 
     /**
