@@ -11,10 +11,11 @@
     }
   ],
   "require": {
-    "the-shop/fortytwo-http": "^0.1.2",
+    "the-shop/fortytwo-http": "dev-master",
     "firebase/php-jwt": "^5.0"
   },
   "require-dev": {
+    "the-shop/fortytwo-base": "@dev",
     "phpunit/phpunit": "^6.3",
     "squizlabs/php_codesniffer": "^3.0"
   },

@@ -12,7 +12,6 @@ class RestApiConfiguration extends ApplicationConfiguration implements RestApiCo
 {
     /**
      * @return array
-     * @throws \RuntimeException
      */
     public function getAuthenticatables(): array
     {
@@ -20,23 +19,21 @@ class RestApiConfiguration extends ApplicationConfiguration implements RestApiCo
 
         $modelsConfig = $this->getPathValue('models');
 
-        if (empty($modelsConfig) === true) {
-            throw new \RuntimeException('No models defined');
-        }
-
-        foreach ($modelsConfig as $modelName => $params) {
-            if (isset($params['authenticatable']) === true &&
-                $params['authenticatable'] === true &&
-                isset($params['authStrategy']) === true &&
-                isset($params['credentials']) === true &&
-                is_array($params['credentials']) === true &&
-                isset($params['aclRoleField']) === true
-            ) {
-                $models[$params['collection']] = [
-                    'strategy' => $params['authStrategy'],
-                    'credentials' => $params['credentials'],
-                    'aclRole' => $params['aclRoleField'],
-                ];
+        if (empty($modelsConfig) === false) {
+            foreach ($modelsConfig as $modelName => $params) {
+                if (isset($params['authenticatable']) === true &&
+                    $params['authenticatable'] === true &&
+                    isset($params['authStrategy']) === true &&
+                    isset($params['credentials']) === true &&
+                    is_array($params['credentials']) === true &&
+                    isset($params['aclRoleField']) === true
+                ) {
+                    $models[$params['collection']] = [
+                        'strategy' => $params['authStrategy'],
+                        'credentials' => $params['credentials'],
+                        'aclRole' => $params['aclRoleField'],
+                    ];
+                }
             }
         }
 
