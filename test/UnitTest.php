@@ -41,7 +41,7 @@ class UnitTest extends TestCase
             ]
         );
 
-        $this->setApplication(new DummyRestApiApplication($config));
+        $this->setApplication((new DummyRestApiApplication($config))->bootstrap());
 
         // Remove render events from the application
         $this->getApplication()

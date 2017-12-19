@@ -14,6 +14,19 @@ use Framework\RestApi\RestApiConfigurationInterface;
 class DummyModule extends BaseModule
 {
     /**
+     *
+     */
+    public function loadConfig()
+    {
+        // Let's read all files from module config folder and set to Configuration
+        $configFile = realpath(dirname(__FILE__)) . '/dummy_module.php';
+
+        $this->getApplication()
+             ->getConfiguration()
+             ->readFromPhp($configFile);
+    }
+
+    /**
      * @inheritdoc
      */
     public function bootstrap()
@@ -27,18 +40,6 @@ class DummyModule extends BaseModule
          */
         $config = $app->getConfiguration();
 
-        // Let's read all files from module config folder and set to Configuration
-        $configFile = realpath(dirname(__FILE__)) . '/dummy_module.php';
-
-        $config->readFromPhp($configFile);
-
-        // Add routes to dispatcher
-        $app->getDispatcher()
-            ->addRoutes($config->getPathValue('routes'));
-
-        // Add acl rules
-        $app->setAclRules($config->getPathValue('acl'));
-
         // Format models configuration
         $modelsConfiguration = $this->generateModelsConfiguration(
             $config->getPathValue('models')
@@ -46,31 +47,9 @@ class DummyModule extends BaseModule
 
         $repositoryManager = $app->getRepositoryManager();
 
-        $modelAdapters = $config->getPathValue('modelAdapters');
-        // Register model adapters
-        foreach ($modelAdapters as $model => $adapters) {
-            foreach ($adapters as $adapter) {
-                $repositoryManager->addModelAdapter($model, new $adapter());
-            }
-        }
-
-        $primaryModelAdapter = $config->getPathValue('primaryModelAdapter');
-        // Register model primary adapters
-        foreach ($primaryModelAdapter as $model => $primaryAdapter) {
-            $repositoryManager->setPrimaryAdapter($model, new $primaryAdapter());
-        }
-
-        $services = $config->getPathValue('services');
-        foreach ($services as $serviceName => $conf) {
-            $app->registerService(new $serviceName($conf));
-        }
-
-
         // Register resources, repositories and model fields
         $repositoryManager->registerResources($modelsConfiguration['resources'])
-                          ->registerRepositories($config->getPathValue('repositories'))
-                          ->registerModelFields($modelsConfiguration['modelFields'])
-                          ->addAuthenticatableModels($config->getAuthenticatables());
+                          ->registerModelFields($modelsConfiguration['modelFields']);
     }
 
     /**
