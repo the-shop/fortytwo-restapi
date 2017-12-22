@@ -36,7 +36,9 @@ class RegistrationListener implements ListenerInterface
 
             foreach ($definedModelAttributes as $attribute => $options) {
                 if (isset($post[$attribute]) === false
-                    && empty($options['default']) === false
+                    && $options['default'] !== ''
+                    && $options['default'] !== null
+                    && $options['default'] !== []
                 ) {
                     $post[$attribute] = $options['default'];
                 }
